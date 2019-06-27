@@ -21,7 +21,11 @@ class Logger {
 
     companion object {
 
-        private var instance: Logger = Logger()
+        private val instance: Logger = Logger()
+
+        fun getLogger(): Logger{
+            return instance
+        }
 
     }
 
