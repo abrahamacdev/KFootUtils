@@ -1,3 +1,5 @@
+package KFoot
+
 import com.andreapivetta.kolor.Color
 import com.andreapivetta.kolor.Kolor
 import java.io.File
@@ -7,7 +9,7 @@ object Utils {
     /**
      * Comprobamos que sistema operativo tiene el cliente
      *
-     * @return Constantes.SO: Sistema operativo del usuario
+     * @return KFoot.Constantes.SO: Sistema operativo del usuario
      */
     fun determinarSistemaOperativo(): Constantes.SO {
         val os = System.getProperty("os.name").toLowerCase()
@@ -33,8 +35,10 @@ object Utils {
         val idioma = System.getProperty("user.language")
 
         when {
-            idioma.equals("es") -> {return Constantes.IDIOMA.ESPANIOL}
-            idioma.equals("en") -> {return Constantes.IDIOMA.INGLES}
+            idioma.equals("es") -> {return Constantes.IDIOMA.ESPANIOL
+            }
+            idioma.equals("en") -> {return Constantes.IDIOMA.INGLES
+            }
         }
 
         return Constantes.IDIOMA.DESCONOCIDO
@@ -58,30 +62,6 @@ object Utils {
      */
     fun esWindows(): Boolean{
         return determinarSistemaOperativo() == Constantes.SO.WINDOWS
-    }
-
-    /**
-     * Logueamos los mensajes pasados por parámetro según el "nivel de debug" necesitado
-     * y el establecido para la sesión actual.
-     *
-     * @param Constantes.DEBUG nivelRequerido: Nivel de debug requerido para mostrar el mensaje
-     * @param String mensaje: Texto a mostrar
-     * @param Color color: Color con el que se mostrará el mensaje
-     */
-    fun debug(nivelRequerido: Constantes.DEBUG, mensaje: String, color: Color = Color.BLACK){
-        // Comprobamos que queremos loguear
-        if (Constantes.DEBUG.DEBUG_LEVEL.value != Constantes.DEBUG.DEBUG_NONE.value){
-
-            // El mensaje es de un test y estamos en el nivel de "Test"
-            if (nivelRequerido.value == Constantes.DEBUG.DEBUG_LEVEL.value && Constantes.DEBUG.DEBUG_LEVEL.value == Constantes.DEBUG.DEBUG_TEST.value){
-                println(Kolor.foreground(mensaje,color))
-            }
-
-            // Ej: Si el nivel actual es 'Avanzado', todos los de nivel 'Simple' también se mostrarán
-            else if (nivelRequerido.value <= Constantes.DEBUG.DEBUG_LEVEL.value && nivelRequerido.value != Constantes.DEBUG.DEBUG_NONE.value){
-                println(Kolor.foreground(mensaje,color))
-            }
-        }
     }
 
     /**
@@ -115,7 +95,7 @@ object Utils {
             so == Constantes.SO.WINDOWS -> {
 
                 // Tanto en español como en ingles la ruta es "\Documents"
-                //ruta = Constantes.DIRECTORIO_PERSONAL + "\\Documents"
+                //ruta = KFoot.Constantes.DIRECTORIO_PERSONAL + "\\Documents"
                 // TODO: Hay problemas a la hora de utilizar "\"
                 ruta = directorioPersonal + "/Documents"
             }
@@ -138,4 +118,41 @@ object Utils {
     fun obtenerDirPersonal(): String{
         return System.getProperty("user.home").replace("\\","/")
     }
+
+    /**
+     * Comprobamos si el objeto recibido por parámetro es
+     * de algún tipo primitivo
+     *
+     * @param objeto: Objeto a comprobar
+     *
+     * @return Boolean: Si el objeto es de algún tipo primitivo
+     */
+    fun esPrimitivo(objeto: Any): Boolean{
+        val clase = objeto.javaClass.canonicalName
+
+        return clase in Constantes.PRIMITIVOS
+    }
+
+    /**
+     * Comprobamos que la clase del nuevo item sea una
+     * subclase del que se usa actualmente en el repositorio
+     *
+     * @param claseHija: Clase que supuestamente es hija
+     * @param clasePadre: Clase que supuestamente es padre
+     *
+     * @return Boolean: Si efectivamente la clase hija hereda de la clase padre
+     */
+    fun esSubclase(claseHija: Class<*>, clasePadre: Class<*>): Boolean {
+
+        var superClase: Class<*>? = claseHija.superclass
+
+        while (superClase != null){
+
+            if (superClase == clasePadre){
+                return true
+            }
+        }
+        return false
+    }
+
 }
