@@ -3,6 +3,8 @@ package KFoot
 import com.andreapivetta.kolor.Color
 import com.andreapivetta.kolor.Kolor
 import java.io.File
+import java.lang.management.ManagementFactory
+import java.lang.reflect.Method
 
 object Utils {
 
@@ -155,4 +157,140 @@ object Utils {
         return false
     }
 
+    /**
+     * Comprobamos si existe un archivo a partir de la ruta
+     * pasada por parámetro
+     *
+     * @param ruta: Ruta del archivo a comprobar
+     *
+     * @return Boolean: Si existe el archivo
+     */
+    fun existeArchivo(ruta: String): Boolean{
+        val f = File(ruta)
+
+        return f.exists() && f.isFile
+    }
+
+    /**
+     * Comprobamos si existe un directorio a partir de la ruta
+     * pasada por parámetro
+     *
+     * @param ruta: Ruta del archivo a comprobar
+     *
+     * @return Boolean: Si existe el archivo
+     */
+    fun existeDirectorio(ruta: String): Boolean{
+        val f = File(ruta)
+
+        return f.exists() && f.isDirectory
+    }
+
+    /**
+     * Retornamos la cantidad de memoria total utilizable
+     * para el programa
+     *
+     * @param unidadAlmacenamiento: Unidad de almacenamiento en la que volveremos el valor
+     *
+     * @return Long: Cantidad de memoria total disponible en su respectiva unidad
+     */
+    fun memoriaTotal(unidadAlmacenamiento: Constantes.UNIDAD_ALMACENAMIENTO = Constantes.UNIDAD_ALMACENAMIENTO.MEGABYTE): Long {
+        when {
+            unidadAlmacenamiento == Constantes.UNIDAD_ALMACENAMIENTO.BYTE -> {
+                return Runtime.getRuntime().totalMemory()
+            }
+            unidadAlmacenamiento == Constantes.UNIDAD_ALMACENAMIENTO.KILOBYTE -> {
+                return Runtime.getRuntime().totalMemory() / 1024
+            }
+            unidadAlmacenamiento == Constantes.UNIDAD_ALMACENAMIENTO.MEGABYTE -> {
+                return Runtime.getRuntime().totalMemory() / 1024 / 1024
+            }
+        }
+        return -1
+    }
+
+    /**
+     * Retornamos la cantidad de memoria total usada
+     * por el programa
+     *
+     * @param unidadAlmacenamiento: Unidad de almacenamiento en la que volveremos el valor
+     *
+     * @return Long: Cantidad de memoria usada por el programa en su respectiva unidad
+     */
+    fun memoriaUsada (unidadAlmacenamiento: Constantes.UNIDAD_ALMACENAMIENTO = Constantes.UNIDAD_ALMACENAMIENTO.MEGABYTE): Long {
+
+        when {
+            unidadAlmacenamiento == Constantes.UNIDAD_ALMACENAMIENTO.BYTE -> {
+                return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()
+            }
+            unidadAlmacenamiento == Constantes.UNIDAD_ALMACENAMIENTO.KILOBYTE -> {
+                return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024
+            }
+            unidadAlmacenamiento == Constantes.UNIDAD_ALMACENAMIENTO.MEGABYTE -> {
+                return ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024) / 1024
+            }
+        }
+        return -1
+    }
+
+    /**
+     * Obtenemos el número de hilos totales de la CPU en la que se está
+     * ejecutando el programa
+     *
+     * @return Int: Cantidad de hilos totales
+     */
+    fun obtenerNumHilos(): Int{
+        return ManagementFactory.getThreadMXBean().threadCount
+    }
+
+    /**
+     * Comprobamos que los métodos recibidos por parámetros
+     * sean iguales comprobando entre otras cosas:
+     *  - Nombre de los métodos
+     *  - Parámetros que reciben cada uno
+     *  - Tipos de retorno
+     *
+     *  @param primero: Primer metodo
+     *  @param segundo: Segundo metodo
+     *
+     *  @return Boolean: Si ambos son el mismo metodo
+     */
+    fun sonElMismoMetodo(primero: Method, segundo: Method): Boolean{
+
+        // Parámetros de ambos métodos
+        val paramsUno = primero.parameters
+        val paramsDos = segundo.parameters
+
+
+        val mismoRetorno = primero.returnType == segundo.returnType
+        val mismoNombre = primero.name.equals(segundo.name)
+        var mismosParametros = false
+
+        // Comprobamos que tengan el mismo número de parámetros
+        if (paramsDos.size == paramsUno.size){
+
+            // No tienen parámetros
+            if (paramsUno.size == 0){
+                mismosParametros = true
+            }
+
+            // Comprobamos que todos los parámetros del primer
+            // métodos sean iguales que los del segundo
+            else {
+
+                // Recorremos los parametros y comprobamos que tengan el mismo nombre
+                // y el mismo tipo
+                val todosIguales = paramsUno.firstOrNull{param1 ->
+                    paramsDos.find{ param2 ->
+                        param1.name.equals(param2.name) && param1.parameterizedType == param2.parameterizedType
+                    } != null
+                }
+
+                if (todosIguales != null){
+                    mismosParametros = true
+                }
+            }
+        }
+
+        return mismoNombre && mismoRetorno && mismosParametros
+    }
 }

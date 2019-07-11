@@ -19,6 +19,12 @@ object Constantes {
         json
     }
 
+    enum class UNIDAD_ALMACENAMIENTO {
+        BYTE,
+        KILOBYTE,
+        MEGABYTE
+    }
+
     val PRIMITIVOS = arrayListOf<String>(Boolean.javaClass.canonicalName,Byte.javaClass.canonicalName,Short.javaClass.canonicalName,Int.javaClass.canonicalName,Long.javaClass.canonicalName,Float.javaClass.canonicalName,Double.javaClass.canonicalName,Char.javaClass.canonicalName)
 
 }
