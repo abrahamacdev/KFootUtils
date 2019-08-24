@@ -13,7 +13,7 @@ enum class DEBUG(val value: Int) {
 enum class IMPORTANCIA(val color: Color) {
     ALTA(Color.RED),
     MEDIA(Color.YELLOW),
-    BAJA(Color.BLUE),
+    BAJA(Color.GREEN),
     NORMAL(Color.BLACK)
 }
 
@@ -47,10 +47,16 @@ class Logger {
      */
     fun debug(nivelRequerido: DEBUG, mensaje: String, importancia: IMPORTANCIA = IMPORTANCIA.NORMAL){
 
-        val claseQueLlama = Thread.currentThread().getStackTrace()[2].className
-        val metodoQueLlama = Thread.currentThread().getStackTrace()[2].methodName
+        val claseMetodoLlamada = obtenerClaseMetodoLlamada()
+        var tracker = ""
 
-        val tracker = "[Clase: $claseQueLlama | Método: $metodoQueLlama] "
+        if (claseMetodoLlamada != null){
+            tracker = "["
+            tracker += Kolor.foreground("Clase: ${claseMetodoLlamada.first}", Color.BLUE)
+            tracker += " - "
+            tracker += Kolor.foreground("Método: ${claseMetodoLlamada.second}", Color.MAGENTA)
+            tracker += "] -> "
+        }
 
         // Comprobamos que queremos loguear
         if (DEBUG_LEVEL.value != DEBUG.DEBUG_NONE.value){
@@ -65,5 +71,35 @@ class Logger {
                 println(Kolor.foreground(tracker + mensaje,importancia.color))
             }
         }
+    }
+
+    /**
+     * Obtenemos la clase y método desde donde se ha realizado la
+     * llamada a [debug]
+     *
+     * @return Pair<String,String>?: Par con la clase y método de procedencia de la llamada
+     */
+    private fun obtenerClaseMetodoLlamada(): Pair<String,String>? {
+
+        // Recorremos el stack de llamadas
+        for (i in 0 until Thread.currentThread().getStackTrace().size){
+
+            val actual = Thread.currentThread().getStackTrace().get(i)
+
+            // Comprobamos si el elemento actual tiene el mismo nombre que [this.javaclass.name]
+            if (actual.className.equals(javaClass.name)){
+
+                // Cogemos el siguiente elemento
+                if (i+1 < Thread.currentThread().getStackTrace().size){
+                    val siguiente = Thread.currentThread().getStackTrace().get(i+1)
+
+                    // Comprobamos si es el que ha solicitado el log
+                    if (!siguiente.className.equals(javaClass.name)){
+                        return Pair(siguiente.className,siguiente.methodName)
+                    }
+                }
+            }
+        }
+        return null
     }
 }
