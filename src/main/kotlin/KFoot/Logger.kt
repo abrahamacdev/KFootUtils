@@ -46,17 +46,23 @@ class Logger {
      * @param Color color: Color con el que se mostrará el mensaje
      */
     fun debug(nivelRequerido: DEBUG, mensaje: String, importancia: IMPORTANCIA = IMPORTANCIA.NORMAL){
+
+        val claseQueLlama = Thread.currentThread().getStackTrace()[2].className
+        val metodoQueLlama = Thread.currentThread().getStackTrace()[2].methodName
+
+        val tracker = "[Clase: $claseQueLlama | Método: $metodoQueLlama] "
+
         // Comprobamos que queremos loguear
         if (DEBUG_LEVEL.value != DEBUG.DEBUG_NONE.value){
 
             // El mensaje es de un test y estamos en el nivel de "Test"
             if (nivelRequerido.value == DEBUG_LEVEL.value && DEBUG_LEVEL.value == DEBUG.DEBUG_TEST.value){
-                println(Kolor.foreground(mensaje,importancia.color))
+                println(Kolor.foreground(tracker + mensaje,importancia.color))
             }
 
             // Ej: Si el nivel actual es 'Avanzado', todos los de nivel 'Simple' también se mostrarán
             else if (nivelRequerido.value <= DEBUG_LEVEL.value && nivelRequerido.value != DEBUG.DEBUG_NONE.value){
-                println(Kolor.foreground(mensaje,importancia.color))
+                println(Kolor.foreground(tracker + mensaje,importancia.color))
             }
         }
     }
