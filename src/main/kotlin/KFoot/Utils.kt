@@ -193,16 +193,20 @@ object Utils {
      *
      * @return Long: Cantidad de memoria total disponible en su respectiva unidad
      */
-    fun memoriaTotal(unidadAlmacenamiento: Constantes.UNIDAD_ALMACENAMIENTO = Constantes.UNIDAD_ALMACENAMIENTO.MEGABYTE): Long {
+    fun memoriaTotalDisponible(unidadAlmacenamiento: Constantes.UNIDAD_ALMACENAMIENTO = Constantes.UNIDAD_ALMACENAMIENTO.MEGABYTE): Long {
+
+        val runtime = Runtime.getRuntime()
+        val base = runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory())
+
         when {
             unidadAlmacenamiento == Constantes.UNIDAD_ALMACENAMIENTO.BYTE -> {
-                return Runtime.getRuntime().totalMemory()
+                return base
             }
             unidadAlmacenamiento == Constantes.UNIDAD_ALMACENAMIENTO.KILOBYTE -> {
-                return Runtime.getRuntime().totalMemory() / 1024
+                return base / 1024
             }
             unidadAlmacenamiento == Constantes.UNIDAD_ALMACENAMIENTO.MEGABYTE -> {
-                return Runtime.getRuntime().totalMemory() / 1024 / 1024
+                return base / 1024 / 1024
             }
         }
         return -1

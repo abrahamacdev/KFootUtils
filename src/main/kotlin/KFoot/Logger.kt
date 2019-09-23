@@ -37,6 +37,10 @@ class Logger {
         DEBUG_LEVEL = debug
     }
 
+    fun getDebugLevel(): DEBUG {
+        return DEBUG_LEVEL
+    }
+
     /**
      * Logueamos los mensajes pasados por parámetro según el "nivel de debug" necesitado
      * y el establecido para la sesión actual.
